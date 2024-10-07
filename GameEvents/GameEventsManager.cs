@@ -1,6 +1,5 @@
 using GTC;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace GameEvents
 {
@@ -59,11 +58,9 @@ namespace GameEvents
 
         public void StartGame()
         {
-            if (!_gameStarted)
-            {
-                _preStartTimer.StartTimer(gamePreStartTime);
-                _gameStarted = true;
-            }
+            if (_gameStarted) return;
+            _preStartTimer.StartTimer(gamePreStartTime);
+            _gameStarted = true;
         }
 
         private void GameEnd()

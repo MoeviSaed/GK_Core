@@ -55,7 +55,7 @@ namespace PoolsContainer.Core
                 if (!obj.gameObject.activeInHierarchy)
                 {
                     poolObject = obj;
-                    if (!poolObject.gameObject.active) poolObject.gameObject.SetActive(true);
+                    if (!poolObject.gameObject.activeInHierarchy) poolObject.gameObject.SetActive(true);
                     else continue;
                     return true;
                 }
