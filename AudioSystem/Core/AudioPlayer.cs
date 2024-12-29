@@ -2,11 +2,15 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Game.Audio
 {
     public class AudioPlayer : MonoBehaviour, IAudioPlayer
     {
+        [SerializeField] private string addressableGroupLabel = "SFX"; // Лейбл группы Addressables (например, "SFX")
+        
         [SerializeField] private string resourcesAudioFolderName;
         [SerializeField] private AudioClip[] clips;
 
@@ -17,26 +21,75 @@ namespace Game.Audio
         protected float lastBaseVolume;
 
         protected AudioManagerCore soundsManager;
-
+        
         public void Initialize(AudioManagerCore soundsManager)
         {
             this.soundsManager = soundsManager;
         }
 
+        // protected virtual void Awake()
+        // {
+        //     clips = Resources.LoadAll<AudioClip>(resourcesAudioFolderName);
+        //
+        //     _audioSources = new List<AudioSourceParameters>();
+        //     _audioClipsMap = new Dictionary<string, AudioClip>();
+        //
+        //     for (int i = 0; i < clips.Length; i++)
+        //     {
+        //         if (!_audioClipsMap.ContainsKey(clips[i].name)) _audioClipsMap.Add(clips[i].name, clips[i]);
+        //         else Debug.LogError(gameObject + " found audioClip with the same name " + clips[i].name);
+        //     }
+        // }
+        
         protected virtual void Awake()
         {
-            clips = Resources.LoadAll<AudioClip>(resourcesAudioFolderName);
-
             _audioSources = new List<AudioSourceParameters>();
             _audioClipsMap = new Dictionary<string, AudioClip>();
 
-            for (int i = 0; i < clips.Length; i++)
+            LoadAudioClipsFromAddressables(addressableGroupLabel);
+        }
+        
+        private void LoadAudioClipsFromAddressables(string label)
+        {
+            Addressables.LoadAssetsAsync<AudioClip>(label, OnAudioClipLoaded).Completed += OnAllClipsLoaded;
+        }
+        
+        private void OnAudioClipLoaded(AudioClip clip)
+        {
+            if (!_audioClipsMap.ContainsKey(clip.name))
             {
-                if (!_audioClipsMap.ContainsKey(clips[i].name)) _audioClipsMap.Add(clips[i].name, clips[i]);
-                else Debug.LogError(gameObject + " found audioClip with the same name " + clips[i].name);
+                _audioClipsMap.Add(clip.name, clip);
+            }
+            else
+            {
+                Debug.LogError(gameObject + " found audioClip with the same name " + clip.name);
+            }
+        }
+        
+        private void OnAllClipsLoaded(AsyncOperationHandle<IList<AudioClip>> handle)
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                Debug.Log($"Successfully loaded {handle.Result.Count} audio clips.");
+            }
+            else
+            {
+                Debug.LogError("Failed to load audio clips from Addressables.");
             }
         }
 
+        // Получение аудиоклипа по имени
+        public AudioClip GetAudioClip(string clipName)
+        {
+            if (_audioClipsMap.TryGetValue(clipName, out var clip))
+            {
+                return clip;
+            }
+
+            Debug.LogWarning($"Audio clip '{clipName}' not found.");
+            return null;
+        }
+        
         public AudioSource PlayAudio(string clipName, float volume, bool loop, float pitch, object obj = null)
        => PlayAudio(new AudioParameters() { clipName = clipName, volume = volume, loop = loop, pitch = pitch }, obj);
 

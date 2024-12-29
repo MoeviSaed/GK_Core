@@ -1,8 +1,5 @@
 using Game.Audio.Core;
-using MVVM;
 using MVVM.Audio;
-using System.Collections;
-using UnityEngine;
 
 namespace Game.Audio
 {
@@ -56,6 +53,8 @@ namespace Game.Audio
         private AudioModel.ParameterMusicVolume _musicVolume;
         private AudioModel.ParameterVibration _vibrationValue;
 
+
+        public static AudioManagerExample Instance;
         protected override void Awake()
         {
             base.Awake();
@@ -63,6 +62,16 @@ namespace Game.Audio
             _sfxVolume = _gameVM.Data<AudioModel.ParameterSFXVolume>();
             _musicVolume = _gameVM.Data<AudioModel.ParameterMusicVolume>();
             _vibrationValue = _gameVM.Data<AudioModel.ParameterVibration>();
+            
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         public override void VibratePop()

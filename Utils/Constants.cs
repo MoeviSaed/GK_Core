@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using DG.Tweening;
+using EntryPointSystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,42 @@ public static class Constants
 {
     private static StringBuilder _builder = new StringBuilder();
 
+    public static (float cellSize, float padding) CalculateCellSize(float width, float height, int columns, int rows)
+    {
+        float paddingPercent = 0.08f;
+
+        float cellWidth = width / (columns + (columns + 1) * paddingPercent);
+        float cellHeight = height / (rows + (rows + 1) * paddingPercent);
+
+        float cellSize = Mathf.Min(cellWidth, cellHeight);
+
+        // Padding — 6% от размера ячейки
+        float padding = cellSize * paddingPercent;
+
+        return (cellSize, padding);
+    }
+
+    
+    /// <summary>
+    /// Получить цвет для заданной буквы из lettersMatrix.
+    /// </summary>
+    /// <param name="letter">Буква, для которой требуется найти цвет.</param>
+    /// <returns>Цвет в формате Color.</returns>
+    public static Color ConvertHexToColor(string hexColor)
+    {
+        if (ColorUtility.TryParseHtmlString(hexColor, out Color parsedColor))
+        {
+            return parsedColor;
+        }
+        
+        return Color.white;
+    }
+    
+    public static string[] SplitWords(string quote)
+    {
+        return quote.Split(new[] { ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+    }
+    
     public static void ShuffleList<T>(this List<T> array)
     {
         var random = new System.Random();

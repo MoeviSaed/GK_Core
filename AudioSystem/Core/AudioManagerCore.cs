@@ -10,6 +10,9 @@ namespace Game.Audio.Core
 
         public SFXPlayer SFXPlayer => sfxPlayer;
         [SerializeField] private SFXPlayer sfxPlayer;
+        
+        public PlayAudio PlayAudio => playAudio;
+        [SerializeField] private PlayAudio playAudio;
 
         public float Sounds
         {
@@ -51,7 +54,7 @@ namespace Game.Audio.Core
 
         protected virtual void Awake()
         {
-            musicPlayer.Initialize(this);
+            if (musicPlayer) musicPlayer.Initialize(this);
             sfxPlayer.Initialize(this);
         }
 

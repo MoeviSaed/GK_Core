@@ -1,6 +1,3 @@
-using GTC;
-using PoolsContainer.Core;
-using UnityEngine;
 
 namespace PoolsContainer.Example
 {
